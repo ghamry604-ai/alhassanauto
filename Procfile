@@ -1,1 +1,1 @@
-web: gunicorn carsite.wsgi --log-file -
+web: gunicorn carsite.wsgi --bind 0.0.0.0: --log-file -
