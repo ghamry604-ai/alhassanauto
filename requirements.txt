@@ -1,9 +1,4 @@
 Django>=4.2,<5.0
 Pillow>=10.0.0
-# Uncomment for PostgreSQL support:
-# psycopg2-binary>=2.9.0
-# Uncomment for production:
-# gunicorn>=21.0.0
-# whitenoise>=6.6.0
 gunicorn
-gunicorn
+whitenoise
