@@ -1,0 +1,136 @@
+{% extends 'dealership/base.html' %}
+{% load static i18n %}
+
+{% block content %}
+
+<div class="container py-5">
+  <div class="row g-5">
+
+    <!-- ===== معرض صور السيارة المتقدم ===== -->
+    <div class="col-lg-7">
+      <div class="position-relative mb-3 border border-secondary rounded overflow-hidden" style="background: #111;">
+        {% if main_image %}
+        <img src="{{ main_image.image.url }}" alt="{{ car }}" class="w-100 img-fluid" id="mainImage" style="max-height: 480px; object-fit: contain;" />
+        {% else %}
+        <div class="d-flex flex-column align-items-center justify-content-center text-muted py-5" style="height: 400px;">
+          <i class="bi bi-car-front display-1 mb-2"></i>
+          <span>{% trans "لا تتوفر صور حالياً للمركبة" %}</span>
+        </div>
+        {% endif %}
+
+        <!-- شارات التميز المباشرة فوق الصورة -->
+        <div class="position-absolute top-0 start-0 m-3 d-flex gap-2">
+          <span class="badge bg-primary px-3 py-2 fs-6 shadow">{{ car.get_condition_display }}</span>
+          {% if car.is_featured %}
+          <span class="badge bg-warning text-dark px-3 py-2 fs-6 shadow">{% trans "متميزة" %}</span>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- الصور المصغرة المساعدة (Thumbnails) -->
+      {% if images.count > 1 %}
+      <div class="d-flex gap-2 flex-wrap">
+        {% for img in images %}
+        <div class="border rounded p-1 thumb-box {% if img.is_main %}border-warning{% else %}border-secondary{% endif %}" style="cursor: pointer; background: #958989; width: 80px; height: 60px;" onclick="switchImage('{{ img.image.url }}', this)">
+          <img src="{{ img.image.url }}" alt="Thumbnail" class="w-100 h-100" style="object-fit: cover;" />
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- ===== لوحة مواصفات وبيانات السيارة الفنية ===== -->
+    <div class="col-lg-5">
+      <div class="p-4 rounded border border-secondary" style="background: #817e7e;">
+        <div class="text-warning fw-bold small text-uppercase mb-1">{{ car.brand.name }}</div>
+        <h2 class="text-white fw-bold mb-2">{{ car.model_name }}</h2>
+        <span class="badge bg-secondary mb-3 fs-6">{% trans "موديل سنة" %}: {{ car.year }}</span>
+
+        <!-- السعر البارز للسيارة -->
+        <div class="text-success fw-bold fs-3 mb-4 border-bottom border-secondary pb-3">{{ car.get_price_display }}</div>
+
+        <!-- فليكس المواصفات السريعة بالأيقونات التوضيحية -->
+        <div class="row g-3 text-center mb-4 text-white">
+          <div class="col-4 bg-dark py-2 border border-secondary rounded">
+            <i class="bi bi-fuel-pump-fill text-warning d-block mb-1 fs-5"></i>
+            <span class="small d-block text-muted">{% trans "وقود" %}</span>
+            <span class="fw-bold small">{{ car.get_fuel_type_display }}</span>
+          </div>
+          <div class="col-4 bg-dark py-2 border border-secondary rounded">
+            <i class="bi bi-gear-fill text-warning d-block mb-1 fs-5"></i>
+            <span class="small d-block text-muted">{% trans "القير" %}</span>
+            <span class="fw-bold small">{{ car.get_transmission_display }}</span>
+          </div>
+          <div class="col-4 bg-dark py-2 border border-secondary rounded">
+            <i class="bi bi-speedometer2 text-warning d-block mb-1 fs-5"></i>
+            <span class="small d-block text-muted">{% trans "الممشى" %}</span>
+            <span class="fw-bold small">{{ car.mileage|floatformat:0 }} كم</span>
+          </div>
+        </div>
+
+        <!-- جدول المواصفات الفنية المحدث بالكامل -->
+        <div class="mb-4">
+          <h5 class="text-white border-bottom border-secondary pb-2 mb-3">{% trans "المواصفات الأساسية" %}</h5>
+          <table class="table table-dark table-sm table-borderless small mb-0 text-white">
+            <tbody>
+              {% for label, value in specs %}
+              <tr>
+                <td class="text-muted py-2">{{ label }}</td>
+                <td class="text-end fw-semibold py-2">{{ value }}</td>
+              </tr>
+              {% endfor %}
+              {% if car.color %}
+              <tr>
+                <td class="text-muted py-2">{% trans "اللون الخارجي" %}</td>
+                <td class="text-end fw-semibold py-2">
+                  <span class="d-inline-block rounded-circle me-1 border border-secondary" style="background: {{ car.color|lower }}; width: 12px; height: 12px; vertical-align: middle;"></span>
+                  {{ car.color }}
+                </td>
+              </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- قنوات الاتصال المباشرة المخصصة للمعرض لإرسال العميل إليها فوراً -->
+        <div class="d-grid gap-2">
+          <a href="tel:+9660506498720" class="btn btn-warning py-2 fw-bold text-dark shadow">
+            <i class="bi bi-telephone-fill me-2"></i>{% trans "اتصل الآن للاستفسار" %}
+          </a>
+          <a href="https://wa.me/9660506498720?text={% trans 'مرحباً، أود الاستفسار عن سيارة' %} {{ car }}" target="_blank" class="btn btn-success py-2 fw-bold shadow">
+            <i class="bi bi-whatsapp me-2"></i>{% trans "تواصل معنا عبر واتساب" %}
+          </a>
+        </div>
+
+        <!-- أزرار مشاركة سريعة للموقع -->
+        <div class="mt-4 text-center border-top border-secondary pt-3">
+          <span class="text-muted small me-2">{% trans "مشاركة هـذه السيارة:" %}</span>
+          <a href="https://wa.me/?text={{ request.build_absolute_uri }}" target="_blank" class="text-success mx-2 fs-5"><i class="bi bi-whatsapp"></i></a>
+          <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" target="_blank" class="text-primary mx-2 fs-5"><i class="bi bi-facebook"></i></a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- الوصف النصي التفصيلي للمركبة -->
+  {% if car.description %}
+  <div class="row mt-5 border-top border-secondary pt-4">
+    <div class="col-lg-8 text-white">
+      <h4 class="fw-bold text-warning mb-3">{% trans "وصف وتفاصيل إضافية للمركبة" %}</h4>
+      <p class="text-muted" style="line-height: 1.8; white-space: pre-line;">{{ car.description }}</p>
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function switchImage(url, thumb) {
+  document.getElementById('mainImage').src = url;
+  document.querySelectorAll('.thumb-box').forEach(t => t.classList.remove('border-warning'));
+  thumb.classList.add('border-warning');
+}
+</script>
+{% endblock %}

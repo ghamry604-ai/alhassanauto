@@ -1,0 +1,150 @@
+{% extends 'dealership/base.html' %}
+{% load static i18n %}
+
+{% block content %}
+
+<!-- عنوان المعرض العلوي -->
+<div class="ae-page-header py-4 bg-near-black border-bottom border-secondary" style="background: #141414;">
+  <div class="container">
+    <h1 class="page-header-title fw-bold text-white">{% trans "معرض" %} <span class="text-warning">السيارات</span></h1>
+    <p class="text-muted mb-0">{{ total_count }} {% trans "سيارة متاحة في صالة العرض حالياً" %}</p>
+  </div>
+</div>
+
+<div class="container py-5">
+  <div class="row g-4">
+
+    <!-- ===== الفلاتر الجانبية التفاعلية المبسطة ===== -->
+    <div class="col-lg-3">
+      <div class="p-3 rounded border border-secondary sticky-top" style="background: #161616; top: 90px;">
+        <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom border-secondary">
+          <h5 class="mb-0 text-white"><i class="bi bi-sliders me-2 text-warning"></i>{% trans "تصفية البحث" %}</h5>
+          {% if current_filters.brand or current_filters.condition or current_filters.fuel_type or current_filters.transmission %}
+          <a href="{% url 'dealership:car_list' %}" class="text-warning small text-decoration-none">{% trans "إعادة تعيين" %}</a>
+          {% endif %}
+        </div>
+
+        <form method="get" id="filterForm">
+          <!-- الماركة -->
+          <div class="mb-4">
+            <label class="form-label text-muted small text-uppercase fw-bold">{% trans "الماركة" %}</label>
+            {% for brand in brands %}
+            <div class="form-check my-1">
+              <input class="form-check-input" type="radio" name="brand" id="brand_{{ brand.slug }}" value="{{ brand.slug }}" {% if current_filters.brand == brand.slug %}checked{% endif %} onchange="document.getElementById('filterForm').submit()">
+              <label class="form-check-label text-white small" for="brand_{{ brand.slug }}">{{ brand.name }}</label>
+            </div>
+            {% endfor %}
+          </div>
+
+          <!-- الحالة -->
+          <div class="mb-4">
+            <label class="form-label text-muted small text-uppercase fw-bold">{% trans "حالة السيارة" %}</label>
+            {% for val, label in condition_choices %}
+            <div class="form-check my-1">
+              <input class="form-check-input" type="radio" name="condition" id="cond_{{ val }}" value="{{ val }}" {% if current_filters.condition == val %}checked{% endif %} onchange="document.getElementById('filterForm').submit()">
+              <label class="form-check-label text-white small" for="cond_{{ val }}">{{ label }}</label>
+            </div>
+            {% endfor %}
+          </div>
+
+          <!-- قير السيارة -->
+          <div class="mb-4">
+            <label class="form-label text-muted small text-uppercase fw-bold">{% trans "نوع ناقل الحركة (القير)" %}</label>
+            {% for val, label in transmission_choices %}
+            <div class="form-check my-1">
+              <input class="form-check-input" type="radio" name="transmission" id="trans_{{ val }}" value="{{ val }}" {% if current_filters.transmission == val %}checked{% endif %} onchange="document.getElementById('filterForm').submit()">
+              <label class="form-check-label text-white small" for="trans_{{ val }}">{{ label }}</label>
+            </div>
+            {% endfor %}
+          </div>
+
+          <!-- نطاق السعر -->
+          <div class="mb-2">
+            <label class="form-label text-muted small text-uppercase fw-bold">{% trans "السعر الحالي" %}</label>
+            <div class="row g-2">
+              <div class="col-6">
+                <input type="number" name="min_price" class="form-control form-control-sm bg-dark text-white border-secondary" placeholder="أقل سعر" value="{{ current_filters.min_price }}">
+              </div>
+              <div class="col-6">
+                <input type="number" name="max_price" class="form-control form-control-sm bg-dark text-white border-secondary" placeholder="أعلى سعر" value="{{ current_filters.max_price }}">
+              </div>
+            </div>
+            <button type="submit" class="btn btn-sm btn-warning w-100 mt-2 fw-semibold text-dark">{% trans "تطبيق نطاق السعر" %}</button>
+          </div>
+
+          <input type="hidden" name="sort" value="{{ current_filters.sort }}">
+        </form>
+      </div>
+    </div>
+
+    <!-- ===== شبكة عرض السيارات ===== -->
+    <div class="col-lg-9">
+      <!-- شريط أدوات الترتيب المحدث -->
+      <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2 p-2 rounded" style="background: #161616;">
+        <div class="text-muted small">
+          {% trans "نعرض الآن" %} <strong class="text-white">{{ page_obj.start_index }}–{{ page_obj.end_index }}</strong> {% trans "من أصل" %} <strong class="text-white">{{ total_count }}</strong> {% trans "سيارات معروضة" %}
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <label class="text-muted small mb-0">{% trans "ترتيب حسب:" %}</label>
+          <select class="form-select bg-dark text-white border-secondary form-select-sm" style="width:auto" onchange="updateSort(this.value)">
+            <option value="-created_at" {% if current_filters.sort == '-created_at' %}selected{% endif %}>{% trans "المضاف حديثاً أولاً" %}</option>
+            <option value="price" {% if current_filters.sort == 'price' %}selected{% endif %}>{% trans "السعر: من الأقل للأعلى" %}</option>
+            <option value="-price" {% if current_filters.sort == '-price' %}selected{% endif %}>{% trans "السعر: من الأعلى للأقل" %}</option>
+            <option value="-year" {% if current_filters.sort == '-year' %}selected{% endif %}>{% trans "الموديل: الأحدث أولاً" %}</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- عرض الجريد أو الكروت -->
+      {% if page_obj %}
+      <div class="row g-4">
+        {% for car in page_obj %}
+        <div class="col-sm-6 col-xl-4">
+          {% include 'dealership/_car_card.html' with car=car %}
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- نظام الصفحات المبسط -->
+      {% if page_obj.has_other_pages %}
+      <nav class="mt-5">
+        <ul class="pagination justify-content-center">
+          {% if page_obj.has_previous %}
+          <li class="page-item">
+            <a class="page-link bg-dark border-secondary text-warning" href="?page={{ page_obj.previous_page_number }}&brand={{ current_filters.brand }}&condition={{ current_filters.condition }}&sort={{ current_filters.sort }}"><i class="bi bi-chevron-right"></i></a>
+          </li>
+          {% endif %}
+          
+          <li class="page-item active"><span class="page-link bg-warning text-dark border-warning fw-bold">{{ page_obj.number }}</span></li>
+
+          {% if page_obj.has_next %}
+          <li class="page-item">
+            <a class="page-link bg-dark border-secondary text-warning" href="?page={{ page_obj.next_page_number }}&brand={{ current_filters.brand }}&condition={{ current_filters.condition }}&sort={{ current_filters.sort }}"><i class="bi bi-chevron-left"></i></a>
+          </li>
+          {% endif %}
+        </ul>
+      </nav>
+      {% endif %}
+
+      {% else %}
+      <div class="text-center py-5 rounded border border-secondary" style="background: #161616;">
+        <i class="bi bi-search display-3 text-muted d-block mb-3"></i>
+        <h4 class="text-muted">{% trans "لم نجد نتائج تطابق خيارات التصفية" %}</h4>
+        <a href="{% url 'dealership:car_list' %}" class="btn btn-warning mt-2 fw-semibold text-dark">{% trans "إلغاء فلاتر البحث" %}</a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function updateSort(value) {
+  const url = new URL(window.location.href);
+  url.searchParams.set('sort', value);
+  url.searchParams.delete('page');
+  window.location.href = url.toString();
+}
+</script>
+{% endblock %}

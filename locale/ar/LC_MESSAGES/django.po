@@ -1,0 +1,68 @@
+# Translation file for Alhasan Auto Project.
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-23 18:16+0000\n"
+"PO-Revision-Date: 2026-05-23 18:16+0000\n"
+"Last-Translator: Mostafa\n"
+"Language-Team: Arabic\n"./setup_and_run.sh
+"Language: ar\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+
+msgid "Arabic"
+msgstr "العربية"
+
+msgid "English"
+msgstr "الإنجليزية"
+
+msgid "Home"
+msgstr "الرئيسية"
+
+msgid "Inventory"
+msgstr "المعرض والمخزون"
+
+msgid "Browse By Brand"
+msgstr "تصفح حسب الماركة"
+
+msgid "No brands yet"
+msgstr "لا توجد ماركات حالياً"
+
+msgid "Call Us"
+msgstr "اتصل بنا"
+
+msgid "Your trusted destination for premium vehicles. Exceptional cars, transparent pricing, unmatched service."
+msgstr "وجهتك الموثوقة للسيارات الفاخرة. سيارات استثنائية، أسعار شفافة، وخدمة لا مثيل لها."
+
+msgid "New Cars"
+msgstr "سيارات جديدة"
+
+msgid "Used Cars"
+msgstr "سيارات مستعملة"
+
+msgid "Certified Pre-Owned"
+msgstr "مستعملة ومضمونة"
+
+msgid "All Inventory"
+msgstr "كل السيارات"
+
+msgid "By Brand"
+msgstr "حسب الماركة"
+
+msgid "Contact Us"
+msgstr "تواصل معنا"
+
+msgid "Location: Al-Qassim - Buraydah, Saudi Arabia"
+msgstr "الموقع: القصيم - بريدة، السعودية"
+
+msgid "Mon–Sat: 9:00 AM – 7:00 PM"
+msgstr "الإثنين–السبت: 9:00 صباحاً – 7:00 مساءً"
+
+msgid "All rights reserved."
+msgstr "جميع الحقوق محفوظة."
+
+msgid "Built with Django & Bootstrap 5"
+msgstr "تم التطوير بواسطة Django & Bootstrap 5"

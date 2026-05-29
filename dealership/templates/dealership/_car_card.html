@@ -1,0 +1,75 @@
+{% load static i18n %}
+{% with main_img=car.get_main_image %}
+<div class="ae-car-card {% if featured %}featured{% endif %} {% if compact %}compact{% endif %} h-100">
+  <a href="{% url 'dealership:car_detail' car.slug %}" class="card-img-wrap">
+    {% if main_img %}
+    <img src="{{ main_img.image.url }}" alt="{{ car }}" class="car-img" loading="lazy" />
+    {% else %}
+    <div class="car-img-placeholder">
+      <i class="bi bi-car-front"></i>
+    </div>
+    {% endif %}
+
+    <div class="card-badges">
+      {% if car.is_featured %}
+      <span class="badge ae-badge-gold">{% trans "Featured" %}</span>
+      {% endif %}
+      <span class="badge ae-badge-condition ae-badge-{{ car.condition }}">
+        {% if LANGUAGE_CODE == 'ar' %}
+          {% if car.condition == 'new' %}جديدة{% elif car.condition == 'used' %}مستعملة{% else %}مستعملة معتمدة{% endif %}
+        {% else %}
+          {{ car.get_condition_display }}
+        {% endif %}
+      </span>
+    </div>
+
+    {% with img_count=car.images.count %}
+    {% if img_count > 1 %}
+    <div class="card-img-count">
+      <i class="bi bi-images"></i> {{ img_count }}
+    </div>
+    {% endif %}
+    {% endwith %}
+  </a>
+
+  <div class="card-body-ae">
+    <div class="card-meta">
+      <span class="car-brand">{{ car.brand.name }}</span>
+      <span class="car-year">{{ car.year }}</span>
+    </div>
+    <h3 class="car-model">
+      <a href="{% url 'dealership:car_detail' car.slug %}">{{ car.model_name }}</a>
+    </h3>
+
+    {% if not compact %}
+    <div class="car-specs">
+      <span>
+        <i class="bi bi-lightning-charge"></i>
+        {% if LANGUAGE_CODE == 'ar' %}
+          {% if car.fuel_type == 'petrol' %}بنزين{% elif car.fuel_type == 'diesel' %}ديزل{% elif car.fuel_type == 'electric' %}كهربائي{% elif car.fuel_type == 'hybrid' %}هجين{% else %}{{ car.get_fuel_type_display }}{% endif %}
+        {% else %}{{ car.get_fuel_type_display }}{% endif %}
+      </span>
+      <span>
+        <i class="bi bi-gear"></i>
+        {% if LANGUAGE_CODE == 'ar' %}
+          {% if car.transmission == 'automatic' %}أوتوماتيك{% elif car.transmission == 'manual' %}يدوي{% elif car.transmission == 'cvt' %}CVT{% else %}{{ car.get_transmission_display }}{% endif %}
+        {% else %}{{ car.get_transmission_display }}{% endif %}
+      </span>
+      {% if car.mileage %}
+      <span>
+        <i class="bi bi-speedometer2"></i>
+        {{ car.mileage|floatformat:0 }} {% if LANGUAGE_CODE == 'ar' %}كم{% else %}km{% endif %}
+      </span>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <div class="card-footer-ae">
+      <div class="car-price">{{ car.get_price_display }}</div>
+      <a href="{% url 'dealership:car_detail' car.slug %}" class="btn-card-link">
+        {% trans "View Details" %} <i class="bi bi-arrow-{% if LANGUAGE_CODE == 'ar' %}left{% else %}right{% endif %}"></i>
+      </a>
+    </div>
+  </div>
+</div>
+{% endwith %}
