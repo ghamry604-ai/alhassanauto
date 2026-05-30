@@ -1,0 +1,29 @@
+# Exclude git files
+.git
+.gitignore
+.github
+
+# Exclude python cache and environment files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+.env
+.venv
+env/
+ENV/
+
+# Exclude IDE settings
+.vscode/
+.idea/
+.antigravity/
+.gemini/
+
+# Exclude local build artifacts
+staticfiles/
+media/
+build_files.sh
+
+# Exclude OS files
+.DS_Store

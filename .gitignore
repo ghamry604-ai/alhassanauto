@@ -5,3 +5,9 @@ db.sqlite3
 media/
 staticfiles/
 *.env
+# Agent Assistant Skills & Context
+.antigravity/
+.gemini/
+CLAUDE.md
+GEMINI.md
+.github/copilot-instructions.md
